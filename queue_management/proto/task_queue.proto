@@ -1,0 +1,74 @@
+syntax = "proto3";
+package taskqueue;
+
+option go_package = "github.com/viratgarg/grpc-demo/queue_management/proto;taskqueue";
+
+// ==================== Service Definition ====================
+
+service TaskQueueService {
+    // Job Client RPCs
+    rpc SubmitTask(TaskRequest) returns (TaskResponse);
+    rpc GetTaskStatus(TaskStatusRequest) returns (TaskStatusResponse);
+
+    // Worker RPCs
+    rpc RegisterWorker(WorkerConfig) returns (WorkerIdResponse);
+    rpc RequestTask(WorkerIdRequest) returns (stream Task);
+    rpc SendHeartbeat(Heartbeat) returns (Acknowledge);
+    rpc UpdateTaskStatus(TaskStatusUpdate) returns (Acknowledge);
+}
+
+// ==================== Job Client Messages ====================
+
+message TaskRequest {
+    string type = 1;      // "CPU" or "IO"
+    string payload = 2;   // e.g., "100" for matrix size or "5" for sleep seconds
+}
+
+message TaskResponse {
+    string task_id = 1;
+}
+
+message TaskStatusRequest {
+    string task_id = 1;
+}
+
+message TaskStatusResponse {
+    string task_id = 1;
+    string status = 2;      // "Queued", "Processing", "Completed", "Failed"
+    string worker_id = 3;   // Worker processing the task (empty if queued)
+}
+
+// ==================== Worker Messages ====================
+
+message WorkerConfig {
+    string worker_type = 1;  // "CPU", "IO", or "BOTH"
+}
+
+message WorkerIdResponse {
+    string worker_id = 1;
+}
+
+message WorkerIdRequest {
+    string worker_id = 1;
+}
+
+message Task {
+    string task_id = 1;
+    string type = 2;       // "CPU" or "IO"
+    string payload = 3;
+}
+
+message Heartbeat {
+    string worker_id = 1;
+}
+
+message Acknowledge {
+    bool success = 1;
+    string message = 2;
+}
+
+message TaskStatusUpdate {
+    string worker_id = 1;
+    string task_id = 2;
+    string status = 3;     // "Processing", "Completed", "Failed"
+}

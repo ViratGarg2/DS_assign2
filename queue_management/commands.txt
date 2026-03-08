@@ -1,0 +1,1 @@
+cd "/Users/virat_garg/Documents/Sem 6/DS/grpc_go/queue_management" && PATH="/opt/homebrew/bin:$(go env GOPATH)/bin:$PATH" protoc --go_out=paths=source_relative:. --go-grpc_out=paths=source_relative:. proto/task_queue.proto
